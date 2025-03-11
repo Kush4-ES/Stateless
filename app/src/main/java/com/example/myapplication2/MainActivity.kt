@@ -60,13 +60,13 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
             end.linkTo(parent.end)
         })
         Box(modifier = Modifier.size(120.dp).background(Color.Yellow).constrainAs(boxYellow){
-            start.linkTo(boxRed.start)
-            bottom.linkTo(boxRed.top)
+            start.linkTo(boxCyan.start)
+            bottom.linkTo(boxCyan.top)
 
         })
         Box(modifier = Modifier.size(120.dp).background(Color.Green).constrainAs(boxGreen){
-            start.linkTo(boxRed.start)
-            top.linkTo(boxRed.bottom)
+            start.linkTo(boxMagenta.start)
+            top.linkTo(boxMagenta.bottom)
         })
         Box(modifier = Modifier.size(120.dp).background(Color.Cyan).constrainAs(boxCyan){
             end.linkTo(boxRed.start)
