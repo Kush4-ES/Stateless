@@ -17,25 +17,28 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.myapplication2.ui.theme.MyApplication2Theme
+import javax.crypto.SecretKey
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,16 +46,150 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplication2Theme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                NumeroSecreto()
                 }
             }
         }
     }
+@Composable
+fun Body() {
+    var name: String by remember { mutableStateOf("") }
+    var showText: Boolean by remember { mutableStateOf(false) }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        TextField(value = name, onValueChange = { name = it }, label = { Text("Enter Your Name") })
+        Button(onClick = { showText = true }) {
+            Text("Say Hello")
+        }
+        Spacer(modifier = Modifier.fillMaxHeight(0.1f))
+        if (showText) {
+            Text("Hello $name ", fontWeight = FontWeight.Bold, fontSize = 24.sp)
+        }
+    }
 }
+
+@Composable
+fun CalculaPropia() {
+    var preuMEnu: String by remember { mutableStateOf("") }
+    var percetatgePropina: String by remember { mutableStateOf("") }
+    var preuTotal : Double by remember { mutableDoubleStateOf(0.0) }
+    var showText: Boolean by remember { mutableStateOf(false) }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        TextField(
+            value = preuMEnu,
+            onValueChange = { preuMEnu = it },
+            label = { Text("Introduiex el preu total del menu") })
+        Spacer(modifier = Modifier.fillMaxHeight(0.1f))
+        TextField(
+            value = percetatgePropina,
+            onValueChange = { percetatgePropina = it },
+            label = { Text("Introduix el porcentatge de la propina") })
+        Button(onClick = {
+            var descuento: Double = percetatgePropina.toDouble() / 100
+            preuTotal = preuMEnu.toDouble() + (descuento * preuMEnu.toDouble())
+            showText = true
+        }) {
+            Text("Calcular")
+        }
+        Spacer(modifier = Modifier.fillMaxHeight(0.1f))
+        if (showText) {
+            Text("Preu Total a Pagar $preuTotal", fontWeight = FontWeight.Bold, fontSize = 24.sp)
+        }
+    }
+}
+
+@Composable
+fun CalculImc() {
+    var nomUsuari: String by remember { mutableStateOf("") }
+    var anyNeixement: String by remember { mutableStateOf("") }
+    var alcada: String by remember { mutableStateOf("") }
+    var edad: Int by remember { mutableStateOf(0) }
+    var pes: String by remember { mutableStateOf("") }
+    var calculo: Double by remember { mutableDoubleStateOf(0.0) }
+    var showText: Boolean by remember { mutableStateOf(false) }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        TextField(
+            value = nomUsuari,
+            onValueChange = { nomUsuari = it },
+            label = { Text("introduix el teu nom d'usuari") })
+        Spacer(modifier = Modifier.fillMaxHeight(0.1f))
+        TextField(
+            value = anyNeixement,
+            onValueChange = { anyNeixement = it },
+            label = { Text("introduix la teva data de naixement") })
+        Spacer(modifier = Modifier.fillMaxHeight(0.1f))
+        TextField(
+            value = alcada,
+            onValueChange = { alcada = it },
+            label = { Text("introduix el teva alçada") })
+        Spacer(modifier = Modifier.fillMaxHeight(0.1f))
+        TextField(
+            value = pes,
+            onValueChange = { pes = it },
+            label = { Text("introduix el teu pes") })
+        Button(onClick = {
+            edad = 2025 - anyNeixement.toInt()
+            calculo = pes.toInt() / Math.pow(alcada.toDouble(), 2.0)
+            showText = true
+        }) {
+            Text("calcula")
+        }
+        if (showText) {
+            if (calculo < 18.5) {
+                Text("$nomUsuari, $edad , IMC Insuficient")
+            } else if (18.5 >= calculo && calculo <= 24.9) {
+                Text("$nomUsuari, $edad , IMC Normal")
+            } else if (25 >= calculo && calculo <= 50) {
+                Text("$nomUsuari, $edad , IMC Sobrepes")
+            } else if (50 <= calculo) {
+                Text("$nomUsuari, $edad , IMC Obesitat")
+            } else {
+                Text("hola Panceta")
+            }
+        }
+    }
+}
+@Composable
+fun NumeroSecreto(){
+    var numeroSecreto : Int by remember { mutableIntStateOf((0..100).random()) }
+    var numero: String by remember { mutableStateOf("") }
+    var showText: Boolean by remember { mutableStateOf(false) }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        TextField(value = numero, onValueChange = { numero = it }, label = { Text("Introdueix un Numero") })
+        Button(onClick = {
+            showText = true }) {
+            Text("Comprobar")
+        }
+        Spacer(modifier = Modifier.fillMaxHeight(0.1f))
+        if (showText) {
+
+        }
+        fun adivinar (numero: String, numeroSecreto : Int){
+            var printar = ""
+            when{
+                numero.toInt() == numeroSecreto -> printar = "Has Encertat"
+                numero.toInt() > numeroSecreto -> printar = "el numero es mes petit"
+                numero.toInt() < numeroSecreto -> printar = "el numero es mes gran"
+            }
+        }
+    }
+}
+
 
 @Composable
 fun exercici3(modifier: Modifier) {
@@ -222,7 +359,7 @@ fun Ejercicio2(modifier: Modifier) {
         Image(
             modifier = Modifier
                 .fillMaxSize()
-                .weight(10f),
+                .weight(1f),
             painter = painterResource(id = R.drawable.ic_task_completed),
             contentDescription = "Example"
         )
@@ -236,7 +373,7 @@ fun Ejercicio2(modifier: Modifier) {
 @Composable
 fun GreetingPreview() {
     MyApplication2Theme {
-        Ejercicio2(modifier = Modifier)
+        NumeroSecreto()
     }
 
 }
