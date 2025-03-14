@@ -172,24 +172,25 @@ fun NumeroSecreto(){
     ) {
         TextField(value = numero, onValueChange = { numero = it }, label = { Text("Introdueix un Numero") })
         Button(onClick = {
-            showText = true }) {
+            showText = true
+            adivinar(numero, numeroSecreto)
+        }) {
             Text("Comprobar")
         }
         Spacer(modifier = Modifier.fillMaxHeight(0.1f))
         if (showText) {
 
         }
-        fun adivinar (numero: String, numeroSecreto : Int){
-            var printar = ""
-            when{
-                numero.toInt() == numeroSecreto -> printar = "Has Encertat"
-                numero.toInt() > numeroSecreto -> printar = "el numero es mes petit"
-                numero.toInt() < numeroSecreto -> printar = "el numero es mes gran"
-            }
-        }
     }
 }
-
+fun adivinar (numero: String, numeroSecreto : Int){
+    var printar = ""
+    when{
+        numero.toInt() == numeroSecreto -> printar = "Has Encertat"
+        numero.toInt() > numeroSecreto -> printar = "el numero es mes petit"
+        numero.toInt() < numeroSecreto -> printar = "el numero es mes gran"
+    }
+}
 
 @Composable
 fun exercici3(modifier: Modifier) {
