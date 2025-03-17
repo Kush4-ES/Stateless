@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.myapplication2.ui.theme.MyApplication2Theme
+import kotlin.random.Random
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,25 +60,6 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun Body() {
-    var name: String by remember { mutableStateOf("") }
-    var showText: Boolean by remember { mutableStateOf(false) }
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        TextField(value = name, onValueChange = { name = it }, label = { Text("Enter Your Name") })
-        Button(onClick = { showText = true }) {
-            Text("Say Hello")
-        }
-        Spacer(modifier = Modifier.fillMaxHeight(0.1f))
-        if (showText) {
-            Text("Hello $name ", fontWeight = FontWeight.Bold, fontSize = 24.sp)
-        }
-    }
-}
 
 @Composable
 fun CalculaPropia() {
@@ -302,219 +284,162 @@ fun Cambio(selecText: String, valor: String): String {
 
 @Composable
 fun LemonadeAPP(modifier: Modifier) {
-    //Variables
-    var estadoImagenes : Int by remember { mutableIntStateOf(1) }
+    var estadoImagenes: Int by remember { mutableIntStateOf(0) } //Estado para controlar el paso
+    var contadorExprimir: Int by remember { mutableIntStateOf(1) }
 
-    var imagenes = when (estadoImagenes) {
-        1 -> R.drawable.lemon_tree
-            2 -> R.drawable.lemon_squeeze
-        3 -> R.drawable.lemon_drink
+    //Hacemos una variable para las imagenes
+    val imagenes = when (estadoImagenes) {
+        0 -> R.drawable.lemon_tree
+        1 -> R.drawable.lemon_squeeze
+        2 -> R.drawable.lemon_drink
         else -> R.drawable.lemon_restart
     }
 
-    var estadoTextos = when(estadoImagenes){
-        1 -> "Agafa una llimona”"
-        2 -> "Esprem la llimona"
-        3 -> "Beu-te-la"
-        else -> "Comença de Nou"
+    //Hacemos una variable para el texto de las imagenes para luego pasarlas
+    var textos = when (estadoImagenes) {
+        0 -> "Agafa una llimona"
+        1 -> "Esprem la llimona"
+        2 -> "Beu-te-la"
+        else -> "Comença de nou"
     }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
+
         Image(
-            painter = painterResource(id = R.drawable.lemon_tree),
-            contentDescription = "Example",
-            alpha = 1f
+            painter = painterResource(id = imagenes), contentDescription = textos, alpha = 2f
         )
-        TextButton(onClick = {
-            if ()
-        }){
-            Text(text = "Clica")
+
+        //Hacemos el TextBotton
+        TextButton(
+            onClick = {
+                if (estadoImagenes == 1) {
+                    contadorExprimir--
+                    if (contadorExprimir <= 0) {
+                        estadoImagenes++
+                    }
+
+                } else {
+                    estadoImagenes++
+                }
+
+                if (estadoImagenes > 3) {
+                    estadoImagenes = 0
+                }
+
+                if (estadoImagenes == 1) {
+                    contadorExprimir = ExprimirRandom()
+                }
+
+            }) {
+            Text(
+                text = textos, fontWeight = FontWeight.Bold,
+                fontSize = 24.sp,
+                color = Color.Black
+            )
         }
     }
 
-    Spacer(modifier = Modifier.fillMaxHeight(0.1f))
 }
 
+fun ExprimirRandom(): Int {
+    return Random.nextInt(1, 10)
+}
+
+}
 @Composable
-fun exercici3(modifier: Modifier) {
-    Column(modifier.fillMaxSize()) {
-        Row(
-            modifier
-                .fillMaxWidth()
-                .weight(1f)
+fun DiceRoller() {
+
+    // Variables
+    var dado_1: Int by remember { mutableIntStateOf(1) }
+    var dado_2: Int by remember { mutableIntStateOf(1) }
+    var dadoImagen1: Int by remember { mutableIntStateOf(R.drawable.dice_1) }
+    var dadoImagen2: Int by remember { mutableIntStateOf(R.drawable.dice_1) }
+    var context = LocalContext.current
+
+    // Fondo
+    Image(
+        painter = painterResource(id = R.drawable.tapestry),
+        contentDescription = "Fondo",
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop
+    )
+
+    Column(
+        Modifier
+            .fillMaxSize()
+            .padding(top = 50.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Top,
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.title),
+            contentDescription = "Logo",
+            modifier = Modifier.size(400.dp)
+        )
+
+        Button(
+            onClick = {
+                //Damos un numero random a los dados
+                dado_1 = NumeroRandomDado()
+                dado_2 = NumeroRandomDado()
+
+                //Cuando hemos dado el numero random, miramos que numero esta y cambiamos la imagen
+                dadoImagen1 = RandomDado(dado_1) //Dado 1
+                dadoImagen2 = RandomDado(dado_2) //Dado 2
+
+                if (dado_1 == 6 && dado_2 == 6) {
+                    Toast.makeText(context, "¡JACKPOT!", Toast.LENGTH_SHORT).show()
+                }
+            },
+            modifier = Modifier.fillMaxWidth(0.9f),
+            colors = buttonColors(containerColor = Color.Red)
         ) {
-            Column(
-                modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                    .background(Color(0xFFEADDFF))
-                    .padding(10.dp),
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    "Text composable",
-                    textAlign = TextAlign.Center,
-                    modifier = modifier.fillMaxWidth(),
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    "Displays text and follows the recommended Material Design guidelines",
-                    textAlign = TextAlign.Justify
-                )
-            }
-            Column(
-                modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                    .background(Color(0xFFD0BCFF))
-                    .padding(10.dp),
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    "Image composable",
-                    textAlign = TextAlign.Center,
-                    modifier = modifier.fillMaxWidth(),
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    "Creates a composable that lays out and draws a given Painter class object.",
-                    textAlign = TextAlign.Justify
-                )
-
-            }
+            Text(text = "Roll the dice", fontSize = 24.sp, color = Color.White)
         }
-        Row(
-            modifier
-                .fillMaxWidth()
-                .weight(1f)
-        ) {
-            Column(
-                modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                    .background(Color(0xFFB69DF8))
-                    .padding(10.dp),
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    "Row composable",
-                    textAlign = TextAlign.Center,
-                    modifier = modifier.fillMaxWidth(),
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    "A layout composable that places its children in a horizontal sequence.",
-                    textAlign = TextAlign.Justify
-                )
 
-            }
-            Column(
-                modifier
-                    .fillMaxHeight()
-                    .weight(1f)
-                    .background(Color(0xFFF6EDFF))
-                    .padding(10.dp),
-                verticalArrangement = Arrangement.Center
-            ) {
-                Text(
-                    "Column composable",
-                    textAlign = TextAlign.Center,
-                    modifier = modifier.fillMaxWidth(),
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    "A layout composable that places its children in a vertical sequence.",
-                    textAlign = TextAlign.Justify
-                )
+        Spacer(Modifier.fillMaxHeight(0.05f))
 
-            }
+        //Dados
+        Row {
+            Image(
+                painter = painterResource(id = dadoImagen1),
+                contentDescription = "Dado 1",
+                modifier = Modifier.size(200.dp).clickable {
+                    dado_1 = NumeroRandomDado()
+                    dadoImagen1 = RandomDado(dado_1)
+                }
+            )
+
+            Image(
+                painter = painterResource(id = dadoImagen2),
+                contentDescription = "Dado 2",
+                modifier = Modifier.size(200.dp).clickable {
+                    dado_2 = NumeroRandomDado()
+                    dadoImagen2 = RandomDado(dado_2)
+                }
+            )
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    ConstraintLayout(modifier.fillMaxSize()) {
-        val (boxRed, boxYellow, boxGreen, boxCyan, boxMagenta) = createRefs()
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .background(Color.Red)
-                .constrainAs(boxRed) {
-                    top.linkTo(parent.top)
-                    bottom.linkTo(parent.bottom)
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                })
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .background(Color.Yellow)
-                .constrainAs(boxYellow) {
-                    bottom.linkTo(boxRed.top)
-                    end.linkTo(boxRed.start)
-                })
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .background(Color.Green)
-                .constrainAs(boxGreen) {
-                    bottom.linkTo(boxRed.top)
-                    start.linkTo(boxRed.end)
-                })
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .background(Color.Cyan)
-                .constrainAs(boxCyan) {
-                    top.linkTo(boxRed.bottom)
-                    end.linkTo(boxRed.start)
-                })
-        Box(
-            modifier = Modifier
-                .size(120.dp)
-                .background(Color.Magenta)
-                .constrainAs(boxMagenta) {
-                    top.linkTo(boxRed.bottom)
-                    start.linkTo(boxRed.end)
-                })
+// Funcion de dado random
+fun RandomDado(dado: Int): Int {
+    return when (dado) {
+        1 -> R.drawable.dice_1
+        2 -> R.drawable.dice_2
+        3 -> R.drawable.dice_3
+        4 -> R.drawable.dice_4
+        5 -> R.drawable.dice_5
+        else -> R.drawable.dice_6
     }
 }
 
-@Composable
-fun Ejercicio1(modifier: Modifier) {
-    Column(modifier = Modifier) {
-        Image(
-            painter = painterResource(id = R.drawable.bg_compose_background),
-            contentDescription = "Example", Modifier.padding(10.dp)
-        )
-        Text("Jetpack Compose tutorial".uppercase())
-        Text(
-            "Jetpack Compose is a modern toolkit for building native Android UI. Compose simplifies and accelerates UI development on Android with less code, powerful tools, and intuitive Kotlin APIs."
-        )
-        Spacer(modifier.height(10.dp))
-        Text("In this tutorial, you build a simple UI component with declarative functions. You call Compose functions to say what elements you want and the Compose compiler does the rest. Compose is built around Composable functions. These functions let you define your app's UI programmatically because they let you describe how it should look and provide data dependencies, rather than focus on the process of the UI's construction, such as initializing an element and then attaching it to a parent. To create a Composable function, you add the @Composable annotation to the function name.")
-    }
-}
-
-@Composable
-fun Ejercicio2(modifier: Modifier) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        Image(
-            modifier = Modifier
-                .fillMaxSize()
-                .weight(1f),
-            painter = painterResource(id = R.drawable.ic_task_completed),
-            contentDescription = "Example"
-        )
-        Text("All Tasks Completed!", textAlign = TextAlign.Center)
-        Text("Nice Work!", textAlign = TextAlign.Center)
-    }
-
+fun NumeroRandomDado(): Int {
+    return Random.nextInt(1, 7)
 }
 
 @Preview(showBackground = true, showSystemUi = true)
