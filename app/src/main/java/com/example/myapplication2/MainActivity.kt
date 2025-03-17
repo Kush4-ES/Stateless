@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,8 +18,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -30,15 +36,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import com.example.myapplication2.ui.theme.MyApplication2Theme
-import javax.crypto.SecretKey
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,11 +53,12 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyApplication2Theme {
-                NumeroSecreto()
-                }
+                LemonadeAPP(modifier = Modifier)
             }
         }
     }
+}
+
 @Composable
 fun Body() {
     var name: String by remember { mutableStateOf("") }
@@ -75,7 +83,7 @@ fun Body() {
 fun CalculaPropia() {
     var preuMEnu: String by remember { mutableStateOf("") }
     var percetatgePropina: String by remember { mutableStateOf("") }
-    var preuTotal : Double by remember { mutableDoubleStateOf(0.0) }
+    var preuTotal: Double by remember { mutableDoubleStateOf(0.0) }
     var showText: Boolean by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -160,36 +168,175 @@ fun CalculImc() {
         }
     }
 }
+
 @Composable
-fun NumeroSecreto(){
-    var numeroSecreto : Int by remember { mutableIntStateOf((0..100).random()) }
+fun NumeroSecreto() {
+    var numeroSecreto: Int by remember { mutableIntStateOf((0..100).random()) }
     var numero: String by remember { mutableStateOf("") }
     var showText: Boolean by remember { mutableStateOf(false) }
+    var contador: Int by remember { mutableIntStateOf(0) }
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        TextField(value = numero, onValueChange = { numero = it }, label = { Text("Introdueix un Numero") })
+        TextField(
+            value = numero,
+            onValueChange = { numero = it; showText = false },
+            label = { Text("Introdueix un Numero") })
         Button(onClick = {
             showText = true
-            adivinar(numero, numeroSecreto)
+            contador++
         }) {
             Text("Comprobar")
         }
         Spacer(modifier = Modifier.fillMaxHeight(0.1f))
         if (showText) {
-
+            Text(adivinar(numero, numeroSecreto))
+            Text("Intentos" + contador.toString())
         }
     }
 }
-fun adivinar (numero: String, numeroSecreto : Int){
+
+fun adivinar(numero: String, numeroSecreto: Int): String {
     var printar = ""
-    when{
+    when {
         numero.toInt() == numeroSecreto -> printar = "Has Encertat"
         numero.toInt() > numeroSecreto -> printar = "el numero es mes petit"
         numero.toInt() < numeroSecreto -> printar = "el numero es mes gran"
     }
+    return printar
+}
+
+@Composable
+fun ConversorUnitats(modifier: Modifier) {
+    var valor: String by remember { mutableStateOf("") }
+    var resultado: String by remember { mutableStateOf("") }
+    var showText: Boolean by remember { mutableStateOf(false) }
+    var selectedText by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    var hobbies = listOf(
+        "De polzada a centímetre",
+        "De iarda a metre",
+        "De milla a quilòmetre",
+        "De centímetre a polzada",
+        "De metre a iarda",
+        "De quilòmetre a milla"
+    )
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            "CONVERSORS UNITARIS",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
+        )
+
+        TextField(
+            value = valor,
+            onValueChange = {
+                valor = it
+                showText = false
+            },
+            label = { Text("Introduce el valor que quieres transformar") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        )
+
+        Column() {
+            OutlinedTextField(
+                value = selectedText,
+                onValueChange = { selectedText = it },
+                enabled = false,
+                readOnly = true,
+                modifier = Modifier
+                    .clickable { expanded = true }
+                    .fillMaxWidth()
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            hobbies.forEach { hobby ->
+                DropdownMenuItem(text = { Text(text = hobby) }, onClick = {
+                    expanded = false
+                    selectedText = hobby
+                })
+            }
+        }
+
+        Button(onClick = {
+            showText = true
+            if (selectedText.isNotBlank() && valor.isNotBlank()) {
+                resultado = Cambio(selectedText, valor)
+            } else {
+                resultado = "Introduce los valores correctamente"
+            }
+        }) {
+            Text("Calcular")
+        }
+        if (showText) {
+            Text(resultado)
+
+        }
+    }
+}
+
+fun Cambio(selecText: String, valor: String): String {
+
+    return when (selecText) {
+        "De polzada a centímetre" -> (valor.toDouble() * 2.54).toString()
+        "De iarda a metre" -> (valor.toDouble() * (91 / 100)).toString()
+        "De milla a quilòmetre" -> (valor.toDouble() * 1.60934).toString()
+        "De centímetre a polzada" -> (valor.toDouble() * 0.39).toString()
+        "De metre a iarda" -> (valor.toDouble() * 1.0936133).toString()
+        "De quilòmetre a milla" -> (valor.toDouble() * 0.621371192).toString()
+        else -> "GORA ETA"
+    }
+}
+
+@Composable
+fun LemonadeAPP(modifier: Modifier) {
+    //Variables
+    var estadoImagenes : Int by remember { mutableIntStateOf(1) }
+
+    var imagenes = when (estadoImagenes) {
+        1 -> R.drawable.lemon_tree
+            2 -> R.drawable.lemon_squeeze
+        3 -> R.drawable.lemon_drink
+        else -> R.drawable.lemon_restart
+    }
+
+    var estadoTextos = when(estadoImagenes){
+        1 -> "Agafa una llimona”"
+        2 -> "Esprem la llimona"
+        3 -> "Beu-te-la"
+        else -> "Comença de Nou"
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Image(
+            painter = painterResource(id = R.drawable.lemon_tree),
+            contentDescription = "Example",
+            alpha = 1f
+        )
+        TextButton(onClick = {
+            if ()
+        }){
+            Text(text = "Clica")
+        }
+    }
+
+    Spacer(modifier = Modifier.fillMaxHeight(0.1f))
 }
 
 @Composable
@@ -374,7 +521,7 @@ fun Ejercicio2(modifier: Modifier) {
 @Composable
 fun GreetingPreview() {
     MyApplication2Theme {
-        NumeroSecreto()
+        LemonadeAPP(modifier = Modifier)
     }
 
 }

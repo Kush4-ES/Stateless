@@ -58,6 +58,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("androidx.constraintlayout:constraintlayout-compose:1.1.1")
     implementation("androidx.compose.material:material-icons-extended-android:1.5.0")
+    implementation(libs.navigation.compose)
+    implementation(libs.kotlinx.serialization.json)
 
 
 }
